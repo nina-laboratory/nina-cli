@@ -1,0 +1,30 @@
+#!/usr/bin/env bun
+import { Command } from "commander";
+import { listProcesses, printProcessTable } from "./commands/list";
+import { killProcesses } from "./commands/kill";
+import chalk from "chalk";
+
+const program = new Command();
+
+program
+    .name("nina")
+    .description("Nina.CLI - Helpful tools for development")
+    .version("1.0.0");
+
+program
+    .command("list")
+    .description("List all processes occupying ports 3000 to 3050")
+    .action(async () => {
+        console.log(chalk.blue("Scanning ports 3000-3050..."));
+        const processes = await listProcesses(3000, 3050);
+        await printProcessTable(processes);
+    });
+
+program
+    .command("kill")
+    .description("Kill all processes occupying ports 3000 to 3050")
+    .action(async () => {
+        await killProcesses(3000, 3050);
+    });
+
+program.parse(process.argv);
