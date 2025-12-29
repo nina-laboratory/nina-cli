@@ -1,0 +1,16 @@
+{
+	"rootPath": "..",
+	"repos": [
+		{
+			"name": "nina-cli",
+			"path": "nina-cli",
+			"apps": [
+				{
+					"name": "nina-cli",
+					"path": ".",
+					"versionFile": "version.txt"
+				}
+			]
+		}
+	]
+}

@@ -27,4 +27,20 @@ program
         await killProcesses(3000, 3050);
     });
 
+program
+    .command("plan")
+    .description("Scan repos and generate a deployment plan")
+    .action(async () => {
+        const { createPlan } = await import("./commands/plan");
+        await createPlan();
+    });
+
+program
+    .command("apply")
+    .description("Execute a previously generated deployment plan")
+    .action(async () => {
+        const { executePlan } = await import("./commands/apply");
+        await executePlan();
+    });
+
 program.parse(process.argv);
