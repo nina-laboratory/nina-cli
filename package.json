@@ -3,6 +3,12 @@
 	"module": "index.ts",
 	"type": "module",
 	"scripts": {
+		"dev": "bun run index.ts --help",
+		"plan": "bun run index.ts plan",
+		"apply": "bun run index.ts apply",
+		"kill": "bun run index.ts kill",
+		"list": "bun run index.ts list",
+		"repo-structure": "bun run index.ts repo-structure",
 		"lint": "bunx biome check --write",
 		"check": "bun x tsc --noEmit && bun x @biomejs/biome check . --diagnostic-level=info",
 		"build": "bun build --compile --minify --sourcemap ./index.ts --outfile nina",

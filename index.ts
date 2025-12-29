@@ -43,4 +43,12 @@ program
 		await executePlan();
 	});
 
+program
+	.command("repo-structure")
+	.description("Check if repositories follow the required structure")
+	.action(async () => {
+		const { checkRepoStructure } = await import("./commands/repo-structure");
+		await checkRepoStructure();
+	});
+
 program.parse(process.argv);
