@@ -4,8 +4,9 @@ import chalk from "chalk";
 import Table from "cli-table3";
 import { config } from "../lib/config";
 
-interface RepoChecks {
-	name: string;
+interface AppChecks {
+	appName: string;
+	repoName: string;
 	hasBiome: boolean;
 	hasVersion: boolean;
 	hasDev: boolean;
@@ -21,51 +22,60 @@ export async function checkRepoStructure() {
 		? path.resolve(process.cwd(), config.rootPath)
 		: process.cwd();
 
-	const results: RepoChecks[] = [];
+	const results: AppChecks[] = [];
 
 	for (const repo of config.repos) {
 		const repoPath = path.resolve(rootDir, repo.path);
 
-		// Check structural files
-		const hasBiome = fs.existsSync(path.join(repoPath, "biome.json"));
-		const hasVersion = fs.existsSync(path.join(repoPath, "version.txt"));
+		for (const app of repo.apps) {
+			const appPath = path.resolve(repoPath, app.path);
 
-		// Check package.json scripts
-		let hasDev = false;
-		let hasLint = false;
-		let hasCheck = false;
-		let hasE2E = false;
+			// Check structural files
+			// Check if biome.json exists in app or repo root
+			const hasBiome = 
+				fs.existsSync(path.join(appPath, "biome.json")) || 
+				fs.existsSync(path.join(repoPath, "biome.json"));
+			
+			const hasVersion = fs.existsSync(path.join(appPath, "version.txt"));
 
-		const packageJsonPath = path.join(repoPath, "package.json");
-		if (fs.existsSync(packageJsonPath)) {
-			try {
-				const packageJson = JSON.parse(
-					fs.readFileSync(packageJsonPath, "utf-8"),
-				);
-				const scripts = packageJson.scripts || {};
-				hasDev = !!scripts.dev;
-				hasLint = !!scripts.lint;
-				hasCheck = !!scripts.check;
-				hasE2E = !!scripts.e2e;
-			} catch (_error) {
-				console.error(chalk.red(`Error reading package.json for ${repo.name}`));
+			// Check package.json scripts
+			let hasDev = false;
+			let hasLint = false;
+			let hasCheck = false;
+			let hasE2E = false;
+
+			const packageJsonPath = path.join(appPath, "package.json");
+			if (fs.existsSync(packageJsonPath)) {
+				try {
+					const packageJson = JSON.parse(
+						fs.readFileSync(packageJsonPath, "utf-8"),
+					);
+					const scripts = packageJson.scripts || {};
+					hasDev = !!scripts.dev;
+					hasLint = !!scripts.lint;
+					hasCheck = !!scripts.check;
+					hasE2E = !!scripts.e2e;
+				} catch (_error) {
+					console.error(chalk.red(`Error reading package.json for ${app.name}`));
+				}
 			}
-		}
 
-		results.push({
-			name: repo.name,
-			hasBiome,
-			hasVersion,
-			hasDev,
-			hasLint,
-			hasCheck,
-			hasE2E,
-		});
+			results.push({
+				appName: app.name,
+				repoName: repo.name,
+				hasBiome,
+				hasVersion,
+				hasDev,
+				hasLint,
+				hasCheck,
+				hasE2E,
+			});
+		}
 	}
 
 	const table = new Table({
 		head: [
-			chalk.cyan("Repo"),
+			chalk.cyan("App"),
 			chalk.cyan("biome.json"),
 			chalk.cyan("version.txt"),
 			chalk.cyan("dev"),
@@ -80,7 +90,7 @@ export async function checkRepoStructure() {
 
 	for (const res of results) {
 		table.push([
-			res.name,
+			res.appName,
 			res.hasBiome ? checkMark : xMark,
 			res.hasVersion ? checkMark : xMark,
 			res.hasDev ? checkMark : xMark,

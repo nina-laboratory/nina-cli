@@ -57,7 +57,7 @@ export async function createPlan() {
 				});
 
 				if (appHasChanges) {
-					const vFilePath = path.join(appPathRelative, app.versionFile);
+					const vFilePath = path.join(appPathRelative, "version.txt");
 					const vFilePathAbsolute = path.resolve(repoPath, vFilePath);
 
 					const currentVersion = await readVersion(vFilePathAbsolute);

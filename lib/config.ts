@@ -4,7 +4,6 @@ import path from "node:path";
 export interface AppConfig {
 	name: string;
 	path: string; // Relative to repo root
-	versionFile: string; // Relative to repo root
 }
 
 export interface RepoConfig {
