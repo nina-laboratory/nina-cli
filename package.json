@@ -11,8 +11,11 @@
 		"repo-structure": "bun run index.ts repo-structure",
 		"lint": "bunx biome check --write",
 		"check": "bun x tsc --noEmit && bun x @biomejs/biome check . --diagnostic-level=info",
-		"build": "bun build --compile --minify --sourcemap ./index.ts --outfile nina",
-		"e2e": "bun x tsc --noEmit"
+
+		"compile": "bun build --compile --minify --sourcemap ./index.ts --outfile nina",
+		"e2e": "bun x tsc --noEmit",
+		"deploy": "bun run index.ts deploy",
+		"build": "bun run index.ts build"
 	},
 	"private": true,
 	"devDependencies": {

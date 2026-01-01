@@ -44,6 +44,23 @@ program
 	});
 
 program
+	.command("build")
+	.description("Trigger the build-and-push workflow on nina-infra")
+	.action(async () => {
+		const { build } = await import("./commands/build");
+		await build();
+	});
+
+program
+	.command("deploy")
+	.description("Deploy a GitHub run to infrastructure")
+	.argument("<url>", "GitHub Actions Run URL")
+	.action(async (url) => {
+		const { deploy } = await import("./commands/deploy");
+		await deploy(url);
+	});
+
+program
 	.command("repo-structure")
 	.description("Check if repositories follow the required structure")
 	.action(async () => {

@@ -32,10 +32,10 @@ export async function checkRepoStructure() {
 
 			// Check structural files
 			// Check if biome.json exists in app or repo root
-			const hasBiome = 
-				fs.existsSync(path.join(appPath, "biome.json")) || 
+			const hasBiome =
+				fs.existsSync(path.join(appPath, "biome.json")) ||
 				fs.existsSync(path.join(repoPath, "biome.json"));
-			
+
 			const hasVersion = fs.existsSync(path.join(appPath, "version.txt"));
 
 			// Check package.json scripts
@@ -56,7 +56,9 @@ export async function checkRepoStructure() {
 					hasCheck = !!scripts.check;
 					hasE2E = !!scripts.e2e;
 				} catch (_error) {
-					console.error(chalk.red(`Error reading package.json for ${app.name}`));
+					console.error(
+						chalk.red(`Error reading package.json for ${app.name}`),
+					);
 				}
 			}
 
