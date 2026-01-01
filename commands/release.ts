@@ -76,11 +76,7 @@ export async function release(releaseNumber: string) {
 		// We can try to extract a title from the body if it has a header, or just default.
 		// User didn't specify title extraction, so "Release X" is a safe default.
 		// Or maybe check the first line of body?
-		let title = `Release ${releaseNumber}`;
-		const lines = bodyContent.split("\n");
-		if (lines.length > 0 && lines[0]?.startsWith("# ")) {
-			title = lines[0].substring(2).trim();
-		}
+		const title = `Release-${releaseNumber}`;
 
 		const entity: ReleaseEntity = {
 			partitionKey: year,
