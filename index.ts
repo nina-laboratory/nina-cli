@@ -61,6 +61,15 @@ program
 	});
 
 program
+	.command("release")
+	.description("Publish release notes from Obsidian to Azure")
+	.argument("<number>", "Release Number")
+	.action(async (number) => {
+		const { release } = await import("./commands/release");
+		await release(number);
+	});
+
+program
 	.command("repo-structure")
 	.description("Check if repositories follow the required structure")
 	.action(async () => {
