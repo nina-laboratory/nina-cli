@@ -16,7 +16,8 @@
 		"deploy": "bun run index.ts deploy",
 		"build": "bun run index.ts build",
 		"release": "bun run index.ts release",
-		"start": "bun run index.ts start"
+		"start": "bun run index.ts start",
+		"documentation": "bun run index.ts documentation"
 	},
 	"private": true,
 	"devDependencies": {

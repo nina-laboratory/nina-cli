@@ -41,7 +41,7 @@
 			"path": "nina-home",
 			"apps": [
 				{
-					"name": "Nina Home",
+					"name": "Nina.Home",
 					"path": ".",
 					"run": true,
 					"port": 4000
@@ -53,10 +53,21 @@
 			"path": "pedroaz-home",
 			"apps": [
 				{
-					"name": "Pedroaz Home",
+					"name": "Pedroaz.Home",
 					"path": ".",
 					"run": true,
 					"port": 4004
+				}
+			]
+		},
+		{
+			"name": "Nina Infra",
+			"path": "nina-infra",
+			"apps": [
+				{
+					"name": "Nina.Infra",
+					"path": ".",
+					"run": false
 				}
 			]
 		}

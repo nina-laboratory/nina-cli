@@ -15,14 +15,14 @@ program
 	.command("list")
 	.description("List all processes occupying ports 3000 to 3050")
 	.action(async () => {
-		console.log(chalk.blue("Scanning ports 3000-3050..."));
-		const processes = await listProcesses(3000, 3050);
+		console.log(chalk.blue("Scanning ports 4000-4050..."));
+		const processes = await listProcesses(4000, 4050);
 		await printProcessTable(processes);
 	});
 
 program
 	.command("kill")
-	.description("Kill all processes occupying ports 3000 to 3050")
+	.description("Kill all processes occupying ports 4000 to 4050")
 	.action(async () => {
 		await killProcesses(4000, 4050);
 	});
@@ -83,6 +83,14 @@ program
 	.action(async () => {
 		const { checkRepoStructure } = await import("./commands/repo-structure");
 		await checkRepoStructure();
+	});
+
+program
+	.command("documentation")
+	.description("Sync documentation from Obsidian vault to apps")
+	.action(async () => {
+		const { documentation } = await import("./commands/documentation");
+		await documentation();
 	});
 
 program.parse(process.argv);
