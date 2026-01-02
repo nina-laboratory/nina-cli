@@ -15,7 +15,8 @@
 		"e2e": "bun x tsc --noEmit",
 		"deploy": "bun run index.ts deploy",
 		"build": "bun run index.ts build",
-		"release": "bun run index.ts release"
+		"release": "bun run index.ts release",
+		"start": "bun run index.ts start"
 	},
 	"private": true,
 	"devDependencies": {

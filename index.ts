@@ -24,7 +24,7 @@ program
 	.command("kill")
 	.description("Kill all processes occupying ports 3000 to 3050")
 	.action(async () => {
-		await killProcesses(3000, 3050);
+		await killProcesses(4000, 4050);
 	});
 
 program
@@ -67,6 +67,14 @@ program
 	.action(async (number) => {
 		const { release } = await import("./commands/release");
 		await release(number);
+	});
+
+program
+	.command("start")
+	.description("Start all apps configured with run: true")
+	.action(async () => {
+		const { start } = await import("./commands/start");
+		await start();
 	});
 
 program

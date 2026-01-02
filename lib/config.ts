@@ -4,6 +4,8 @@ import path from "node:path";
 export interface AppConfig {
 	name: string;
 	path: string; // Relative to repo root
+	run?: boolean;
+	port?: number;
 }
 
 export interface RepoConfig {

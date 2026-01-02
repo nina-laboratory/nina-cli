@@ -1,0 +1,64 @@
+{
+	"rootPath": "..",
+	"repos": [
+		{
+			"name": "Nina.CLI",
+			"path": "nina-cli",
+			"apps": [
+				{
+					"name": "Nina.CLI",
+					"path": ".",
+					"run": false
+				}
+			]
+		},
+		{
+			"name": "Nina Web Apps",
+			"path": "nina-web-apps",
+			"apps": [
+				{
+					"name": "Nina.Fit",
+					"path": "apps/nina-fit",
+					"run": true,
+					"port": 4002
+				},
+				{
+					"name": "Nina.Journal",
+					"path": "apps/nina-journal",
+					"run": true,
+					"port": 4001
+				},
+				{
+					"name": "Nina.Quick",
+					"path": "apps/nina-quick",
+					"run": true,
+					"port": 4003
+				}
+			]
+		},
+		{
+			"name": "Nina Home",
+			"path": "nina-home",
+			"apps": [
+				{
+					"name": "Nina Home",
+					"path": ".",
+					"run": true,
+					"port": 4000
+				}
+			]
+		},
+		{
+			"name": "Pedroaz Home",
+			"path": "pedroaz-home",
+			"apps": [
+				{
+					"name": "Pedroaz Home",
+					"path": ".",
+					"run": true,
+					"port": 4004
+				}
+			]
+		}
+	]
+}
