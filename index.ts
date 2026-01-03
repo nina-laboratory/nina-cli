@@ -86,11 +86,6 @@ program
 	});
 
 program
-	.command("documentation")
-	.description("Sync documentation from Obsidian vault to apps")
-	.action(async () => {
-		const { documentation } = await import("./commands/documentation");
-		await documentation();
-	});
+
 
 program.parse(process.argv);

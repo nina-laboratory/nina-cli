@@ -29,39 +29,25 @@ export async function release(releaseNumber: string) {
 		process.exit(1);
 	}
 
-	const releaseMetaFile = path.join(
-		releasesFolder,
-		`Release-${releaseNumber}.md`,
-	);
-	const releaseBodyFile = path.join(
-		releasesFolder,
-		`Release-${releaseNumber}-MD.md`,
-	);
+	const releaseFile = path.join(releasesFolder, `release-${releaseNumber}.md`);
 
 	console.log(chalk.blue(`Preparing Release ${releaseNumber}...`));
-	console.log(chalk.gray(`Reading metadata from: ${releaseMetaFile}`));
-	console.log(chalk.gray(`Reading body from: ${releaseBodyFile}`));
+	console.log(chalk.gray(`Reading from: ${releaseFile}`));
 
 	try {
-		const [metaContent, bodyContent] = await Promise.all([
-			readFile(releaseMetaFile, "utf-8"),
-			readFile(releaseBodyFile, "utf-8"),
-		]);
+		const releaseContent = await readFile(releaseFile, "utf-8");
 
-		// 1. Parse Apps from Metadata
-		// Look for lines like ![[Nina.Home#Nina.Home-R1]]
-		const appRegex = /!\[\[(.*?)(?:#.*)?\]\]/g;
+		// 1. Parse Apps from Content headers
+		// Header format: # AppName
+		// Example: # Nina.Home
+		const appHeaderRegex = /^#\s+([a-zA-Z0-9.-]+)/gm;
 		const appsSet = new Set<string>();
 
-		// Biome friendly regex loop
-		const matches = metaContent.matchAll(appRegex);
+		const matches = releaseContent.matchAll(appHeaderRegex);
 		for (const match of matches) {
 			if (match[1]) {
-				const appNameRaw = match[1].split("#")[0];
-				if (appNameRaw) {
-					const appName = appNameRaw.toLowerCase().replace(/\./g, "-");
-					appsSet.add(appName);
-				}
+				const appName = match[1].trim().toLowerCase().replace(/\./g, "-");
+				appsSet.add(appName);
 			}
 		}
 
@@ -73,9 +59,6 @@ export async function release(releaseNumber: string) {
 		// 2. Prepare Entity Data
 		const year = new Date().getFullYear().toString();
 		const releaseId = releaseNumber;
-		// We can try to extract a title from the body if it has a header, or just default.
-		// User didn't specify title extraction, so "Release X" is a safe default.
-		// Or maybe check the first line of body?
 		const title = `Release-${releaseNumber}`;
 
 		const entity: ReleaseEntity = {
@@ -84,7 +67,7 @@ export async function release(releaseNumber: string) {
 			title: title,
 			date: new Date().toISOString(),
 			apps: JSON.stringify(apps),
-			body: bodyContent,
+			body: releaseContent,
 		};
 
 		// 3. Update Azure Table Storage
@@ -102,11 +85,6 @@ export async function release(releaseNumber: string) {
 		const credential = new DefaultAzureCredential();
 		const client = new TableClient(endpoint, tableName, credential);
 
-		await client.createTable();
-		// Helper to insure table exists is done by createTable (it creates if not exists usually, or we catch 409).
-		// Actually createTable throws if exists. explicit create?
-		// client.createTable() creates it. If it exists it might throw?
-		// Let's safe create table.
 		try {
 			await client.createTable();
 		} catch (createError: unknown) {
@@ -125,11 +103,7 @@ export async function release(releaseNumber: string) {
 	} catch (error: unknown) {
 		const e = error as AzureError & { code?: string };
 		if (e.code === "ENOENT") {
-			console.error(
-				chalk.red(
-					`Error: Clean file not found. Make sure Release-${releaseNumber}.md and Release-${releaseNumber}-MD.md exist in ${releasesFolder}`,
-				),
-			);
+			console.error(chalk.red(`Error: Release file not found: ${releaseFile}`));
 		} else {
 			console.error(chalk.red("Failed to create release:"), error);
 		}
