@@ -1,18 +1,26 @@
 import path from "node:path";
+import readline from "node:readline/promises";
 import chalk from "chalk";
 import Table from "cli-table3";
 import { config } from "../lib/config";
-import { getRepoDiff, getRepoDiffSummary, getRepoStatus } from "../lib/git";
+import {
+	getRepoDiff,
+	getRepoDiffSummary,
+	getRepoStatus,
+	runCommit,
+	runPush,
+} from "../lib/git";
 import { LLMService } from "../lib/llm";
-import { writePlan } from "../lib/persistence/plan-file";
+import { deletePlan, readPlan, writePlan } from "../lib/persistence/plan-file";
 import type {
 	CommitAction,
 	ShipperPlan,
 	VersionUpdate,
 } from "../lib/persistence/types";
-import { incrementVersion, readVersion } from "../lib/version";
+import { incrementVersion, readVersion, writeVersion } from "../lib/version";
 
-export async function createPlan() {
+export async function commit() {
+	// --- PLAN PHASE ---
 	console.log(chalk.blue("Planning deployment..."));
 
 	const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -28,7 +36,6 @@ export async function createPlan() {
 	const rootDir = config.rootPath
 		? path.resolve(process.cwd(), config.rootPath)
 		: process.cwd();
-	// console.debug(`Root directory: ${rootDir}`);
 
 	for (const repo of config.repos) {
 		const repoPath = path.resolve(rootDir, repo.path);
@@ -50,7 +57,6 @@ export async function createPlan() {
 
 			for (const app of repo.apps) {
 				const appPathRelative = app.path;
-
 				const appHasChanges = status.files.some((f) => {
 					if (appPathRelative === "." || appPathRelative === "./") return true;
 					return f.path.startsWith(appPathRelative);
@@ -121,12 +127,12 @@ export async function createPlan() {
 		return;
 	}
 
-	const plan: ShipperPlan = {
+	const initialPlan: ShipperPlan = {
 		createdAt: new Date().toISOString(),
 		actions,
 	};
 
-	await writePlan(plan);
+	await writePlan(initialPlan);
 
 	console.log(`\n${chalk.bold("Plan Summary:")}`);
 	const table = new Table({
@@ -158,6 +164,92 @@ export async function createPlan() {
 		]);
 	}
 	console.log(table.toString());
+	console.log(
+		chalk.dim(
+			"\nYou can edit 'shipper.plan.json' now to modify commit messages or versions.",
+		),
+	);
 
-	console.log(`\nRun ${chalk.bold("nina apply")} to execute this plan.`);
+	// --- PROMPT PHASE ---
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	});
+
+	const answer = await rl.question(
+		`\n${chalk.bold("Do you want to proceed? (yes/no)")} `,
+	);
+	rl.close();
+
+	if (answer.toLowerCase() !== "yes") {
+		console.log(chalk.yellow("Operation cancelled."));
+		await deletePlan();
+		return;
+	}
+
+	// --- APPLY PHASE ---
+	console.log(chalk.blue("\nApplying deployment..."));
+
+	// Re-read plan to pick up any manual edits
+	const plan = await readPlan();
+	if (!plan) {
+		console.error(
+			chalk.red("Error: 'shipper.plan.json' not found or invalid."),
+		);
+		process.exit(1);
+	}
+
+	const applyTable = new Table({
+		head: [chalk.cyan("Repo"), chalk.cyan("Action"), chalk.cyan("Status")],
+	});
+
+	for (const action of plan.actions) {
+		// 1. Update Version Files
+		if (action.versionUpdates.length > 0) {
+			for (const update of action.versionUpdates) {
+				const fullPath = path.resolve(action.repoPath, update.filePath);
+				try {
+					await writeVersion(fullPath, update.newVersion);
+					applyTable.push([
+						action.repoName,
+						`Update version ${update.filePath}`,
+						chalk.green("Done"),
+					]);
+				} catch (e: unknown) {
+					const err = e as Error;
+					applyTable.push([
+						action.repoName,
+						`Update version ${update.filePath}`,
+						chalk.red(`Failed: ${err.message}`),
+					]);
+				}
+			}
+		}
+
+		// 2. Commit
+		try {
+			await runCommit(action.repoPath, action.commitMessage, ["."]);
+			applyTable.push([
+				action.repoName,
+				`Commit: "${action.commitMessage}"`,
+				chalk.green("Done"),
+			]);
+
+			// 3. Push
+			await runPush(action.repoPath);
+			applyTable.push([action.repoName, `Push to remote`, chalk.green("Done")]);
+		} catch (error: unknown) {
+			const err = error as Error;
+			applyTable.push([
+				action.repoName,
+				`Push/Commit`,
+				chalk.red(`Failed: ${err.message}`),
+			]);
+		}
+	}
+
+	console.log(applyTable.toString());
+
+	await deletePlan();
+	console.log(chalk.green("\nAll actions processed. Plan deleted."));
 }

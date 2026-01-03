@@ -28,19 +28,11 @@ program
 	});
 
 program
-	.command("plan")
-	.description("Scan repos and generate a deployment plan")
+	.command("commit")
+	.description("Plan and execute deployment (commit & push)")
 	.action(async () => {
-		const { createPlan } = await import("./commands/plan");
-		await createPlan();
-	});
-
-program
-	.command("apply")
-	.description("Execute a previously generated deployment plan")
-	.action(async () => {
-		const { executePlan } = await import("./commands/apply");
-		await executePlan();
+		const { commit } = await import("./commands/commit");
+		await commit();
 	});
 
 program
@@ -85,7 +77,6 @@ program
 		await checkRepoStructure();
 	});
 
-program
-
+program;
 
 program.parse(process.argv);

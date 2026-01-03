@@ -4,8 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bun run index.ts --help",
-		"plan": "bun run index.ts plan",
-		"apply": "bun run index.ts apply",
+		"commit": "bun run index.ts commit",
 		"kill": "bun run index.ts kill",
 		"list": "bun run index.ts list",
 		"repo-structure": "bun run index.ts repo-structure",
