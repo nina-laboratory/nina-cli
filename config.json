@@ -73,7 +73,7 @@
 		},
 		{
 			"name": "Nina Releases",
-			"path": "releases",
+			"path": "nina-releases",
 			"apps": [
 				{
 					"name": "Nina.Releases",
