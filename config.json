@@ -70,6 +70,17 @@
 					"run": false
 				}
 			]
+		},
+		{
+			"name": "Nina Releases",
+			"path": "releases",
+			"apps": [
+				{
+					"name": "Nina.Releases",
+					"path": ".",
+					"run": false
+				}
+			]
 		}
 	]
 }
