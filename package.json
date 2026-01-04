@@ -11,6 +11,7 @@
 		"lint": "bunx biome check --write",
 		"check": "bun x tsc --noEmit && bun x @biomejs/biome check . --diagnostic-level=info",
 		"compile": "bun build --compile --minify --sourcemap ./index.ts --outfile nina",
+		"move": "sudo mv nina /usr/local/bin/",
 		"e2e": "bun x tsc --noEmit",
 		"deploy": "bun run index.ts deploy",
 		"build": "bun run index.ts build",
