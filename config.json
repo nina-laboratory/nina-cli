@@ -33,6 +33,12 @@
 					"path": "apps/nina-quick",
 					"run": true,
 					"port": 4003
+				},
+				{
+					"name": "Nina.CVGenerator",
+					"path": "apps/nina-cv-generator",
+					"run": true,
+					"port": 4005
 				}
 			]
 		},
