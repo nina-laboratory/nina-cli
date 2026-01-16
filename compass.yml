@@ -1,0 +1,18 @@
+name: nina-cli
+id: ari:cloud:compass:ea6ad01b-2af2-4c30-823f-db7e7c43b840:component/a7ed47e6-8173-4a43-a41c-3e58a529f553/b226f7de-2612-4df0-a14b-3287cba34799
+description: null
+configVersion: 1
+typeId: APPLICATION
+ownerId: null
+fields:
+  tier: 4
+links:
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/nina-laboratory/nina-cli
+relationships:
+  DEPENDS_ON: []
+labels:
+  - language:typescript
+  - source:github
+customFields: null
